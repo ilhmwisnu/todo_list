@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:hive/hive.dart';
 import 'package:todo_list_app/provider/todos.dart';
 
 class Todo {
@@ -13,7 +14,17 @@ class Todo {
     required this.task,
   });
 
-  void toggleIsDone() {
+  Future<void> toggleIsDone() async {
     isDone = !isDone;
+    update();
+  }
+
+  Future<void> update() async {
+    Box box = await Hive.openBox("todo");
+    box.put(id, {
+      "task": task,
+      "desc": desc,
+      "isDone": isDone,
+    });
   }
 }

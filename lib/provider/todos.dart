@@ -16,14 +16,10 @@ class Todos with ChangeNotifier {
       "isDone": false,
     });
     _todoList.add(Todo(desc: desc, task: task, id: id));
-    print(box.toMap());
-
     notifyListeners();
   }
 
   void sortTodoList() async {
-    var box = await Hive.openBox('todo');
-    // box.clear();
     _todoList.sort((a, b) => (a.isDone) ? 1 : -1);
     notifyListeners();
   }
@@ -40,6 +36,20 @@ class Todos with ChangeNotifier {
             id: data.key,
             isDone: data.value["isDone"]),
       );
+    }
+
+    sortTodoList();
+  }
+
+  Todo getTodoById(id) {
+    return _todoList.firstWhere((e) => e.id == id);
+  }
+
+  Future<void> deleteData(List<int> datasId) async {
+    var box = await Hive.openBox('todo');
+    for (var id in datasId) {
+      _todoList.removeWhere((todo) => todo.id == id);
+      box.delete(id);
     }
     notifyListeners();
   }
